@@ -37,6 +37,5 @@ jobs:
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
           docker build -t bid90/msemail .
           docker tag bid90/msemail $IMAGE_ID:$VERSION
-          docker tag bid90/msemail $IMAGE_ID:latest
           docker push $IMAGE_ID:$VERSION
-          docker push $IMAGE_ID:latest
+     
