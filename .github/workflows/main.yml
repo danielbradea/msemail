@@ -1,0 +1,42 @@
+name: Build Docker Image
+
+on:
+  workflow_dispatch:
+    inputs:
+      safety_check:
+        description: 'Confirm to proceed with building and pushing the Docker image'
+        required: true
+        type: boolean
+
+jobs:
+  build:
+    if: ${{ github.event.inputs.safety_check == 'true' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build with Maven
+        run: |
+          mvn clean install
+          mvn package spring-boot:build-image -Dspring-boot.build-image.imageName=bid90/msemail -DskipTests
+
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login ghcr.io -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Build Docker image
+        run: |
+          IMAGE_ID=ghcr.io/${{ secrets.DOCKER_USERNAME }}/bid90/msemail
+          VERSION=v${{ github.run_number }}
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+          docker build -t bid90/msemail .
+          docker tag bid90/msemail $IMAGE_ID:$VERSION
+          docker tag bid90/msemail $IMAGE_ID:latest
+          docker push $IMAGE_ID:$VERSION
+          docker push $IMAGE_ID:latest
