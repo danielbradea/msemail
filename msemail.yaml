@@ -1,0 +1,23 @@
+
+
+networks:
+  msemail_networks:
+    external: false
+
+services:
+  msemail:
+    image: ghcr.io/danielbradea/bid90/msemail:latest
+    ports:
+      - 8082:8082
+    networks:
+      - msemail_networks
+    environment:
+      - PORT=8082
+      - RMQ_HOST=localhost
+      - RMQ_PORT=5672
+      - RMQ_USER=user
+      - RMQ_PASSWORD=password
+      - RMQ_VHOST=msemail
+      - JWT_SECRET=d5501539-43e9-4e97-8256-4ab29a5bf539
+      - AUTH_SERVICE=http://localhost:8080/mslogin
+      - ALLOWED_ORIGINS:http://localhost:4200
