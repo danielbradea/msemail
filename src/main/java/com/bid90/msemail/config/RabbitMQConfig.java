@@ -1,6 +1,8 @@
 package com.bid90.msemail.config;
 
 import com.bid90.msemail.UtilClass;
+import com.bid90.msemail.dto.EmailRequest;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
@@ -12,6 +14,9 @@ import org.springframework.amqp.support.converter.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 @EnableRabbit
@@ -30,7 +35,6 @@ public class RabbitMQConfig {
 
     @Value("${spring.rabbitmq.username}")
     private String username;
-
     @Value("${rmq.password.file}")
     private String rmqPasswordFile;
     @Value("${spring.rabbitmq.password}")
@@ -70,8 +74,19 @@ public class RabbitMQConfig {
      * @return a new {@link Jackson2JsonMessageConverter} instance.
      */
     @Bean
-    public MessageConverter messageConverter() {
-        return new Jackson2JsonMessageConverter();
+    public Jackson2JsonMessageConverter jsonMessageConverter() {
+        Jackson2JsonMessageConverter jsonConverter = new Jackson2JsonMessageConverter();
+        jsonConverter.setClassMapper(classMapper());
+        return jsonConverter;
+    }
+
+    @Bean
+    public DefaultClassMapper classMapper() {
+        DefaultClassMapper classMapper = new DefaultClassMapper();
+        Map<String, Class<?>> idClassMapping = new HashMap<>();
+        idClassMapping.put("com.bid90.login.models.dtos.EmailRequest", EmailRequest.class);
+        classMapper.setIdClassMapping(idClassMapping);
+        return classMapper;
     }
 
     /**
