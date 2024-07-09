@@ -82,9 +82,9 @@ public class RabbitMQConfig {
 
     @Bean
     public DefaultClassMapper classMapper() {
-        DefaultClassMapper classMapper = new DefaultClassMapper();
         Map<String, Class<?>> idClassMapping = new HashMap<>();
         idClassMapping.put("com.bid90.login.models.dtos.EmailRequest", EmailRequest.class);
+        DefaultClassMapper classMapper = new DefaultClassMapper();
         classMapper.setIdClassMapping(idClassMapping);
         return classMapper;
     }
